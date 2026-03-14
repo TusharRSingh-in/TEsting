@@ -108,7 +108,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 
     <script>
-        var socket = io();
+        // This tells the frontend to connect to the current website URL
+var socket = io.connect(window.location.protocol + '//' + window.location.host);
 
         // Get the elements from your HTML (Double check these IDs match yours!)
         const inputArea = document.querySelector('textarea[name="text"]'); 

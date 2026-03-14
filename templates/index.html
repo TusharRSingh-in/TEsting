@@ -108,45 +108,35 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 
     <script>
-        // This tells the frontend to connect to the current website URL
-var socket = io.connect(window.location.protocol + '//' + window.location.host);
-
-        // Get the elements from your HTML (Double check these IDs match yours!)
-        const inputArea = document.querySelector('textarea[name="text"]'); 
-        const outputArea = document.getElementById('translated-text-display');
-        const srcLang = document.querySelector('select[name="src_lang"]');
-        const destLang = document.querySelector('select[name="dest_lang"]');
-
-        // Listen for typing
-        inputArea.addEventListener('input', () => {
-            socket.emit('realtime_translate', {
-                text: inputArea.value,
-                src_lang: srcLang.value,
-                dest_lang: destLang.value
-            });
+        // Force websocket connection for faster performance on Render
+        const socket = io({
+            transports: ["websocket", "polling"]
         });
 
-        // Update the screen when translation arrives
+        let timeout = null;
+        const inputArea = document.querySelector('textarea[name="text"]');
+        const outputArea = document.getElementById('translated-text-display');
+
+        socket.on('connect', () => {
+            console.log("Connected to server!");
+        });
+
+        inputArea.addEventListener('input', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                socket.emit('realtime_translate', {
+                    text: inputArea.value,
+                    src_lang: document.querySelector('select[name="src_lang"]').value,
+                    dest_lang: document.querySelector('select[name="dest_lang"]').value
+                });
+            }, 400); // Slightly longer delay for stable cloud translation
+        });
+
         socket.on('update_result', (data) => {
             if(outputArea) {
                 outputArea.innerText = data.translated_text;
             }
         });
-        let timeout = null;
-
-inputArea.addEventListener('input', () => {
-    // Clear the timer every time the user types a new letter
-    clearTimeout(timeout);
-
-    // Set a new timer to wait 300ms after the last keystroke
-    timeout = setTimeout(() => {
-        socket.emit('realtime_translate', {
-            text: inputArea.value,
-            src_lang: srcLang.value,
-            dest_lang: destLang.value
-        });
-    }, 300); // 300ms is the "sweet spot" for real-time feel
-});
     </script>
     
 </body>

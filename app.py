@@ -9,7 +9,12 @@ translator = Translator()
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
-socketio = SocketIO(app, cors_allowed_origins="*")
+# Add logger=True so you can see connection errors in Render logs
+socketio = SocketIO(app, 
+                    cors_allowed_origins="*", 
+                    async_mode='eventlet', 
+                    engineio_logger=True, 
+                    logger=True)
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 # Languages configuration (same as in ui.py)

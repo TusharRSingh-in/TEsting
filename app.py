@@ -30,7 +30,11 @@ LANGUAGES = {
     "Malayalam": "ml"
 }
 
-@socketio.on('realtime_translate')
+socketio = SocketIO(app, 
+                    async_mode='eventlet', 
+                    cors_allowed_origins="*")
+
+@socketio.on('realtime_translation')
 def handle_realtime(data):
     # 1. Get data safely
     text = data.get('text')

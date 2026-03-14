@@ -42,7 +42,7 @@
     <div id="text" class="tab-content active">
     <div class="form-group">
         <label>Source Language</label>
-        <select name="src_lang">
+        <select id="src_lang" name="src_lang">
             {% for lang in languages %}
             <option value="{{ lang }}" {% if lang == selected_src %}selected{% endif %}>{{ lang }}</option>
             {% endfor %}
@@ -50,7 +50,7 @@
     </div>
     <div class="form-group">
         <label>Destination Language</label>
-        <select name="dest_lang">
+        <select id="dest_lang" name="dest_lang">
             {% for lang in languages %}
             <option value="{{ lang }}" {% if lang == selected_dest %}selected{% endif %}>{{ lang }}</option>
             {% endfor %}
@@ -58,7 +58,7 @@
     </div>
     <div class="form-group">
         <label>Enter Text</label>
-        <textarea name="text" placeholder="Type something here...">{{ original_text }}</textarea>
+        <textarea id="text-input" name="text" placeholder="Type something here...">{{ original_text }}</textarea>
     </div>
 
     <div class="result-box">
@@ -114,10 +114,10 @@
             upgrade: false
         });
 
-        const inputArea = document.querySelector('textarea[name="text"]');
+        const inputArea = document.getElementById('text-input');
         const outputArea = document.getElementById('translated-text-display');
-        const srcLang = document.querySelector('select[name="src_lang"]');
-        const destLang = document.querySelector('select[name="dest_lang"]');
+        const srcLang = document.getElementById('src_lang');
+        const destLang = document.getElementById('dest_lang');
 
         socket.on('connect', () => {
             console.log("Connected to Render WebSocket!");
@@ -133,9 +133,10 @@
         });
 
         socket.on('update_result', (data) => {
-    console.log("Data received from server:", data); // Add this line
-    document.getElementById('your-id').innerText = data.translated_text;
-});
+            if(outputArea) {
+                outputArea.innerText = data.translated_text;
+            }
+        });
     </script>
     
 </body>

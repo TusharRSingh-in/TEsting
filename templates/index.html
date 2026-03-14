@@ -133,10 +133,9 @@
         });
 
         socket.on('update_result', (data) => {
-            if(outputArea) {
-                outputArea.innerText = data.translated_text;
-            }
-        });
+    console.log("Data received from server:", data); // Add this line
+    document.getElementById('your-id').innerText = data.translated_text;
+});
     </script>
     
 </body>

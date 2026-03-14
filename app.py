@@ -30,12 +30,7 @@ LANGUAGES = {
     "Malayalam": "ml"
 }
 
-# Change this line:
-socketio = SocketIO(app)
-
-# To this (allows all connections):
-socketio = SocketIO(app, cors_allowed_origins="*")
-
+@socketio.on('realtime_translate')
 def handle_realtime(data):
     translated = translator.translate(data['text'], dest='hi').text
     emit('update_result', {'translated_text': translated})

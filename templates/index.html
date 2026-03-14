@@ -105,31 +105,31 @@
 
     
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
     <script>
-        // Force websocket connection for faster performance on Render
+        // Force WebSocket transport and point to the correct URL
         const socket = io({
-            transports: ["websocket", "polling"]
+            transports: ['websocket'],
+            upgrade: false
         });
 
-        let timeout = null;
         const inputArea = document.querySelector('textarea[name="text"]');
         const outputArea = document.getElementById('translated-text-display');
+        const srcLang = document.querySelector('select[name="src_lang"]');
+        const destLang = document.querySelector('select[name="dest_lang"]');
 
         socket.on('connect', () => {
-            console.log("Connected to server!");
+            console.log("Connected to Render WebSocket!");
         });
 
+        // Ensure your event name matches your app.py (@socketio.on('translate'))
         inputArea.addEventListener('input', () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                socket.emit('realtime_translate', {
-                    text: inputArea.value,
-                    src_lang: document.querySelector('select[name="src_lang"]').value,
-                    dest_lang: document.querySelector('select[name="dest_lang"]').value
-                });
-            }, 400); // Slightly longer delay for stable cloud translation
+            socket.emit('realtime_translate', {
+                text: inputArea.value,
+                src_lang: srcLang.value,
+                dest_lang: destLang.value
+            });
         });
 
         socket.on('update_result', (data) => {

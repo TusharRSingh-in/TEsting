@@ -63,7 +63,7 @@
 
     <div class="result-box">
         <h3>Result:</h3>
-        <p id="translated-text-display" style="white-space: pre-wrap;">{{ translated_text }}</p>
+        <p id="result-display" style="white-space: pre-wrap;">{{ translated_text }}</p>
     </div>
 </div>
 
@@ -115,7 +115,7 @@
         });
 
         const inputArea = document.getElementById('text-input');
-        const outputArea = document.getElementById('translated-text-display');
+        const outputArea = document.getElementById('result-display');
         const srcLang = document.getElementById('src_lang');
         const destLang = document.getElementById('dest_lang');
 
@@ -123,19 +123,19 @@
             console.log("Connected to Render WebSocket!");
         });
 
-        // Ensure your event name matches your app.py (@socketio.on('translate'))
+        // Ensure your event name matches your app.py (@socketio.on('realtime_translation'))
         inputArea.addEventListener('input', () => {
-            socket.emit('realtime_translate', {
+            console.log("Typing detected: " + inputArea.value); // Add this!
+            socket.emit('realtime_translation', {
                 text: inputArea.value,
-                src_lang: srcLang.value,
-                dest_lang: destLang.value
+                src_lang: document.getElementById('src_lang').value,
+                dest_lang: document.getElementById('dest_lang').value
             });
         });
 
         socket.on('update_result', (data) => {
-            if(outputArea) {
-                outputArea.innerText = data.translated_text;
-            }
+            console.log("Server sent back:", data); // Add this!
+            document.getElementById('result-display').innerText = data.translated_text;
         });
     </script>
     

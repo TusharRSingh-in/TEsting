@@ -124,12 +124,12 @@
         const destLang = document.getElementById('dest_lang');
 
         socket.on('connect', () => {
-            console.log("Connected to Render WebSocket!");
+            // console.log("Connected to Render WebSocket!");
         });
 
         // Ensure your event name matches your app.py (@socketio.on('realtime_translation'))
         inputArea.addEventListener('input', () => {
-            console.log("Typing detected: " + inputArea.value); // Add this!
+            // console.log("Typing detected: " + inputArea.value); // Add this!
             socket.emit('realtime_translation', {
                 text: inputArea.value,
                 src_lang: document.getElementById('src_lang').value,
@@ -138,7 +138,7 @@
         });
 
         socket.on('update_result', (data) => {
-            console.log("Server sent back:", data); // Add this!
+            // console.log("Server sent back:", data); // Add this!
             document.getElementById('result-display').innerText = data.translated_text;
         });
     </script>

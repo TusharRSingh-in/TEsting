@@ -171,14 +171,31 @@
         const ttsBtn = document.getElementById('tts-btn');
         ttsBtn.addEventListener('click', () => {
             const textToSpeak = document.getElementById('result-display').innerText;
-            const destLang = document.getElementById('dest_lang').value; // e.g., 'hi' or 'te'
+            const destLang = document.getElementById('dest_lang').value; // 'hi', 'te', etc.
 
             if (textToSpeak && textToSpeak !== "Result will appear here...") {
+                window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(textToSpeak);
-                
-                // This helps the browser pick the right accent/voice
-                utterance.lang = destLang; 
-                
+
+                // 1. Get all available voices
+                const voices = window.speechSynthesis.getVoices();
+
+                // 2. Find the voice that matches the language code (e.g., 'hi-IN')
+                // We look for a voice where the lang starts with our code
+                const selectedVoice = voices.find(voice => 
+                    voice.lang.startsWith(destLang) || 
+                    (destLang === 'hi' && voice.lang === 'hi-IN')
+                );
+
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                    utterance.lang = selectedVoice.lang;
+                } else {
+                    // Fallback if specific voice isn't found
+                    utterance.lang = destLang === 'hi' ? 'hi-IN' : destLang;
+                }
+
+                utterance.rate = 0.9; 
                 window.speechSynthesis.speak(utterance);
             }
         });

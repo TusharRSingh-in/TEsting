@@ -26,6 +26,10 @@
         button.submit-btn:hover { background-color: #357abd; }
 
         .result-box { margin-top: 20px; padding: 15px; background: #eef; border-radius: 5px; border: 1px solid #ccd; }
+        #result-display {
+            min-height: 50px;
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +59,7 @@
             <option value="{{ lang }}" {% if lang == selected_dest %}selected{% endif %}>{{ lang }}</option>
             {% endfor %}
         </select>
-    </div>
+    </div>,
     <div class="form-group">
         <label>Enter Text</label>
         <textarea id="text-input" name="text" placeholder="Type something here...">{{ original_text }}</textarea>
@@ -63,7 +67,7 @@
 
     <div class="result-box">
         <h3>Result:</h3>
-        <p id="result-display" style="white-space: pre-wrap;">{{ translated_text }}</p>
+        <p id="result-display">{{ translated_text }}</p>
     </div>
 </div>
 

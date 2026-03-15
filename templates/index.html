@@ -67,7 +67,18 @@
 
     <div class="result-box">
         <h3>Result:</h3>
-        <p id="result-display">{{ translated_text }}</p>
+        <div class="result-container">
+            <div id="result-display" class="border p-3 bg-light">{{ translated_text }}</div>
+            
+            <div class="mt-2">
+                <button id="copy-btn" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+                <button id="tts-btn" class="btn btn-info btn-sm">
+                    <i class="fas fa-volume-up"></i> Listen
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -140,6 +151,36 @@
         socket.on('update_result', (data) => {
             // console.log("Server sent back:", data); // Add this!
             document.getElementById('result-display').innerText = data.translated_text;
+        });
+
+        // --- 1. Copy to Clipboard Logic ---
+        const copyBtn = document.getElementById('copy-btn');
+        copyBtn.addEventListener('click', () => {
+            const textToCopy = document.getElementById('result-display').innerText;
+            
+            if (textToCopy && textToCopy !== "Result will appear here...") {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = "✅ Copied!";
+                    setTimeout(() => { copyBtn.innerHTML = originalText; }, 2000);
+                });
+            }
+        });
+
+        // --- 2. Voice Synthesis (TTS) Logic ---
+        const ttsBtn = document.getElementById('tts-btn');
+        ttsBtn.addEventListener('click', () => {
+            const textToSpeak = document.getElementById('result-display').innerText;
+            const destLang = document.getElementById('dest_lang').value; // e.g., 'hi' or 'te'
+
+            if (textToSpeak && textToSpeak !== "Result will appear here...") {
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
+                
+                // This helps the browser pick the right accent/voice
+                utterance.lang = destLang; 
+                
+                window.speechSynthesis.speak(utterance);
+            }
         });
     </script>
     

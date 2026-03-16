@@ -58,32 +58,41 @@ def handle_realtime(data):
             emit('update_result', {'translated_text': "Error in translation..."})
 
 @app.route("/", methods=["GET", "POST"])
-
 def index():
     translated_text = ""
     original_text = ""
-    selected_src = "English"
-    selected_dest = "Hindi"
+    selected_src_code = "en"
+    selected_dest_code = "hi"
+
+    # Handle GET parameters for selected languages
+    selected_src_name = request.args.get('src_lang', 'English')
+    selected_dest_name = request.args.get('dest_lang', 'Hindi')
+    selected_src_code = LANGUAGES.get(selected_src_name, 'en')
+    selected_dest_code = LANGUAGES.get(selected_dest_name, 'hi')
 
     # Handle Text Translation
     if request.method == "POST" and "translate_text" in request.form:
         original_text = request.form.get("text", "")
-        selected_src = request.form.get("src_lang", "English")
-        selected_dest = request.form.get("dest_lang", "Hindi")
+        selected_src_code = request.form.get("src_lang", "en")
+        selected_dest_code = request.form.get("dest_lang", "hi")
 
         if original_text:
-            src_code = LANGUAGES.get(selected_src)
-            dest_code = LANGUAGES.get(selected_dest)
-            # We don't use progress callback for synchronous web requests
+            src_code = selected_src_code
+            dest_code = selected_dest_code
             translated_text = translate_text(original_text, src_code, dest_code)
+
+        # Redirect to update URL with names
+        selected_src_name = {v: k for k, v in LANGUAGES.items()}[selected_src_code]
+        selected_dest_name = {v: k for k, v in LANGUAGES.items()}[selected_dest_code]
+        return redirect(url_for('index', src_lang=selected_src_name, dest_lang=selected_dest_name))
 
     return render_template(
         "index.html",
         languages=LANGUAGES,
         translated_text=translated_text,
         original_text=original_text,
-        selected_src=selected_src,
-        selected_dest=selected_dest
+        selected_src_code=selected_src_code,
+        selected_dest_code=selected_dest_code
     )
 
 @app.route("/upload", methods=["POST"])
@@ -95,10 +104,8 @@ def upload_file():
     if file.filename == "":
         return "No selected file", 400
 
-    src_lang = request.form.get("src_lang", "English")
-    dest_lang = request.form.get("dest_lang", "Hindi")
-    src_code = LANGUAGES.get(src_lang, "en")
-    dest_code = LANGUAGES.get(dest_lang, "hi")
+    src_code = request.form.get("src_lang", "en")
+    dest_code = request.form.get("dest_lang", "hi")
 
     # Save uploaded file
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)

@@ -36,22 +36,21 @@ socketio = SocketIO(app,
 
 @socketio.on('realtime_translation')
 def handle_realtime(data):
-#1. Get data safely
     text = data.get('text')
-    src_lang = data.get('src_lang', 'en') # Default to 'en'
-    dest_lang = data.get('dest_lang', 'hi') # Default to 'hi'
-#print (f"Received for translation: (text) from (src_lang) to (dest_lang}")
+    src_name = data.get('src_lang', 'English') 
+    dest_name = data.get('dest_lang', 'Hindi')
+
     if text and text.strip():
-      try:
-#2. Translate using your existing function
-# Make sure src_lang and dest_lang are the short codes (like 'en', 'hi')
-          translated = translate_text(text, src_lang, dest_lang)
-#3. Send back to frontend
-#print(f"Success! Translated: (translated)")
-          emit('update_result', {'translated_text': translated})
-      except Exception as e:
-#print(f"Translation Error: {e}")
-          emit('update_result', {'translated_text': "Error in translation..."})
+        try:
+            src_code = LANGUAGES.get(src_name, 'en')
+            dest_code = LANGUAGES.get(dest_name, 'hi')
+
+            translated = translate_text(text, src_code, dest_code)
+            emit('update_result', {'translated_text': translated})
+
+        except Exception as e:
+            print(f"Translation Error: {e}")
+            emit('update_result', {'translated_text': "Error in translation..."})
 
 @app.route("/", methods=["GET", "POST"])
 def index():

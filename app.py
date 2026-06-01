@@ -34,7 +34,7 @@ socketio = SocketIO(app,
                     async_mode='eventlet', 
                     cors_allowed_origins="*")
 
-@socketio.on('realtime_translation')
+@socketio.on('realtime_translate')
 def handle_realtime(data):
     # 1. Get incoming data safely (Frontend sends full names like 'English', 'Hindi')
     text = data.get('text')

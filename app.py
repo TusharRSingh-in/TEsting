@@ -37,21 +37,22 @@ socketio = SocketIO(app,
 @socketio.on('realtime_translation')
 def handle_realtime(data):
     text = data.get('text')
-    src_name = data.get('src_lang', 'English') 
-    dest_name = data.get('dest_lang', 'Hindi')
+    src_lang = data.get('src_lang', 'English')
+    dest_lang = data.get('dest_lang', 'Hindi')
 
     if text and text.strip():
         try:
-            src_code = LANGUAGES.get(src_name, 'en')
-            dest_code = LANGUAGES.get(dest_name, 'hi')
-
+            # Safely map full language names to short codes
+            src_code = LANGUAGES.get(src_lang, 'en')
+            dest_code = LANGUAGES.get(dest_lang, 'hi')
+            
+            # Use your background engine that handles chunking and delays safely
             translated = translate_text(text, src_code, dest_code)
             emit('update_result', {'translated_text': translated})
-
         except Exception as e:
-            print(f"Translation Error: {e}")
-            emit('update_result', {'translated_text': "Error in translation..."})
-
+            print(f"Socket translation error: {e}")
+            emit('update_result', {'translated_text': "Translation error..."})
+          
 @app.route("/", methods=["GET", "POST"])
 def index():
     translated_text = ""

@@ -4,8 +4,8 @@ import time
 # This bypasses all networking firewalls completely
 LOCAL_DICT = {
     ("en", "hi"): {
-        "hello": "नमस्ते (Namaste)",
-        "hello ": "नमस्ते (Namaste)",
+        "hello": "नमस्ते ",
+        "hello ": "नमस्ते ",
         "how are you?": "आप कैसे हैं?",
         "good morning": "शुभ प्रभात",
         "thank you": "धन्यवाद",

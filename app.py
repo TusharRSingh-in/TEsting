@@ -16,17 +16,17 @@ socketio = SocketIO(app,
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Languages configuration
+# Languages configuration updated for MyMemory API requirements
 LANGUAGES = {
-    "English": "en",
-    "Hindi": "hi",
-    "Bengali": "bn",
-    "Marathi": "mr",
-    "Urdu": "ur",
-    "Telugu": "te",
-    "Tamil": "ta",
-    "Kannada": "kn",
-    "Malayalam": "ml"
+    "English": "en-GB",
+    "Hindi": "hi-IN",
+    "Bengali": "bn-IN",
+    "Marathi": "mr-IN",
+    "Urdu": "ur-PK",
+    "Telugu": "te-IN",
+    "Tamil": "ta-IN",
+    "Kannada": "kn-IN",
+    "Malayalam": "ml-IN"
 }
 
 @socketio.on('realtime_translation')
@@ -37,11 +37,11 @@ def handle_realtime(data):
 
     if text and text.strip():
         try:
-            # Safely map full language names to short codes
-            src_code = LANGUAGES.get(src_lang, 'en')
-            dest_code = LANGUAGES.get(dest_lang, 'hi')
+            # Match fallback strings to your new MyMemory regional dictionary values
+            src_code = LANGUAGES.get(src_lang, 'en-GB')
+            dest_code = LANGUAGES.get(dest_lang, 'hi-IN')
             
-            # Use your deep-translator backend engine
+            # This calls your working MyMemory engine perfectly
             translated = translate_text(text, src_code, dest_code)
             emit('update_result', {'translated_text': translated})
         except Exception as e:

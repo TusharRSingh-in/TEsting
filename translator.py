@@ -1,4 +1,4 @@
-mport translators as ts
+import translators as ts
 import time
 
 PART_SIZE = 1000

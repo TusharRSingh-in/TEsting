@@ -1,23 +1,22 @@
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, redirect, url_for
 from flask_socketio import SocketIO, emit
 import os
 from translator import translate_text
 from file_handler import read_txt, read_pdf, read_docx, write_txt
-from googletrans import Translator
-
-translator = Translator()
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
-# Add logger=True so you can see connection errors in Render logs
+
+# Properly configured SocketIO instance with loggers active
 socketio = SocketIO(app, 
                     cors_allowed_origins="*", 
                     async_mode='eventlet', 
                     engineio_logger=True, 
                     logger=True)
+
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# Languages configuration (same as in ui.py)
+# Languages configuration
 LANGUAGES = {
     "English": "en",
     "Hindi": "hi",
@@ -29,10 +28,6 @@ LANGUAGES = {
     "Kannada": "kn",
     "Malayalam": "ml"
 }
-
-socketio = SocketIO(app, 
-                    async_mode='eventlet', 
-                    cors_allowed_origins="*")
 
 @socketio.on('realtime_translation')
 def handle_realtime(data):
@@ -46,7 +41,7 @@ def handle_realtime(data):
             src_code = LANGUAGES.get(src_lang, 'en')
             dest_code = LANGUAGES.get(dest_lang, 'hi')
             
-            # Use your background engine that handles chunking and delays safely
+            # Use your deep-translator backend engine
             translated = translate_text(text, src_code, dest_code)
             emit('update_result', {'translated_text': translated})
         except Exception as e:
@@ -66,20 +61,18 @@ def index():
     selected_src_code = LANGUAGES.get(selected_src_name, 'en')
     selected_dest_code = LANGUAGES.get(selected_dest_name, 'hi')
 
-    # Handle Text Translation
+    # Handle Text Translation (Form POST fallback)
     if request.method == "POST" and "translate_text" in request.form:
         original_text = request.form.get("text", "")
         selected_src_code = request.form.get("src_lang", "en")
         selected_dest_code = request.form.get("dest_lang", "hi")
 
         if original_text:
-            src_code = selected_src_code
-            dest_code = selected_dest_code
-            translated_text = translate_text(original_text, src_code, dest_code)
+            translated_text = translate_text(original_text, selected_src_code, selected_dest_code)
 
         # Redirect to update URL with names
-        selected_src_name = {v: k for k, v in LANGUAGES.items()}[selected_src_code]
-        selected_dest_name = {v: k for k, v in LANGUAGES.items()}[selected_dest_code]
+        selected_src_name = {v: k for k, v in LANGUAGES.items()}.get(selected_src_code, 'English')
+        selected_dest_name = {v: k for k, v in LANGUAGES.items()}.get(selected_dest_code, 'Hindi')
         return redirect(url_for('index', src_lang=selected_src_name, dest_lang=selected_dest_name))
 
     return render_template(

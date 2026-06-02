@@ -16,7 +16,7 @@ def translate_text(text, src, dest, progress_callback=None):
 
     for index, part in enumerate(parts, start=1):
         try:
-            # deep-translator uses a clean, updated connection pattern
+            # This uses deep-translator instead of googletrans
             result = GoogleTranslator(source=src, target=dest).translate(part)
             translated_parts.append(result if result else "")
 
@@ -26,6 +26,6 @@ def translate_text(text, src, dest, progress_callback=None):
         if progress_callback:
             progress_callback(index, total_parts)
 
-        time.sleep(0.3)  # Can be faster now since deep-translator is optimized
+        time.sleep(0.3)  # Safe delay between chunks
 
     return "\n".join(translated_parts)

@@ -1,7 +1,7 @@
-from deep_translator import GoogleTranslator
+from deep_translator import MyMemoryTranslator
 import time
 
-PART_SIZE = 2500
+PART_SIZE = 1000  # MyMemory prefers slightly smaller chunk sizes for free tier
 
 def split_text(text, size):
     return [text[i:i + size] for i in range(0, len(text), size)]
@@ -16,8 +16,8 @@ def translate_text(text, src, dest, progress_callback=None):
 
     for index, part in enumerate(parts, start=1):
         try:
-            # This uses deep-translator instead of googletrans
-            result = GoogleTranslator(source=src, target=dest).translate(part)
+            # Swap GoogleTranslator for MyMemoryTranslator
+            result = MyMemoryTranslator(source=src, target=dest).translate(part)
             translated_parts.append(result if result else "")
 
         except Exception as e:
@@ -26,6 +26,6 @@ def translate_text(text, src, dest, progress_callback=None):
         if progress_callback:
             progress_callback(index, total_parts)
 
-        time.sleep(0.3)  # Safe delay between chunks
+        time.sleep(0.5)  # Respectful delay between API chunk calls
 
     return "\n".join(translated_parts)
